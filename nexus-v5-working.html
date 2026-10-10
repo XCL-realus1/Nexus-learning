@@ -1,0 +1,1521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Nexus · Meridian Corp</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Outfit:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#06070d;--deep:#0c0e1a;--surface:#111422;--lift:#181c2e;
+  --rim:rgba(255,255,255,0.06);--rim2:rgba(255,255,255,0.12);
+  --gold:#c8a96e;--gold2:#e8c98e;--ember:#d4522a;--ember2:#f07040;
+  --teal:#2a8f82;--teal2:#3db5a4;
+  --text:#e8e4dc;--muted:#7a7870;
+  --r:12px;--ease:cubic-bezier(0.23,1,0.32,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:16px;}
+body{font-family:'Outfit',sans-serif;background:var(--void);color:var(--text);min-height:100vh;overflow-x:hidden;}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9900;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");opacity:.5;}
+
+.screen{display:none;min-height:100vh;width:100%;flex-direction:column;}
+.screen.active{display:flex;}
+
+@keyframes rise{from{opacity:0;transform:translateY(22px);}to{opacity:1;transform:translateY(0);}}
+@keyframes fade{from{opacity:0;}to{opacity:1;}}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:.7;}50%{transform:scale(1.25);opacity:1;}}
+@keyframes shimmer{0%,100%{opacity:.3;}50%{opacity:1;}}
+@keyframes scanline{from{transform:translateY(-100%);}to{transform:translateY(100vh);}}
+@keyframes glow{0%,100%{box-shadow:0 0 18px rgba(200,169,110,.2);}50%{box-shadow:0 0 36px rgba(200,169,110,.55);}}
+@keyframes nxPop{from{opacity:0;transform:translateY(12px) scale(.95);}to{opacity:1;transform:translateY(0) scale(1);}}
+@keyframes nxBadge{0%,100%{transform:scale(1);}50%{transform:scale(1.18);}}
+
+/* ══ WELCOME ══ */
+#s-welcome{justify-content:center;align-items:center;background:var(--void);overflow:hidden;position:relative;}
+.w-bg{position:absolute;inset:0;background:radial-gradient(ellipse 120% 80% at 15% 10%,rgba(200,169,110,.07) 0%,transparent 55%),radial-gradient(ellipse 80% 120% at 85% 90%,rgba(42,143,130,.06) 0%,transparent 55%);}
+.w-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.015) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.015) 1px,transparent 1px);background-size:80px 80px;}
+.w-scan{position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(200,169,110,.35),transparent);animation:scanline 6s linear infinite;pointer-events:none;}
+.w-content{position:relative;z-index:2;width:100%;max-width:540px;padding:48px 32px;animation:rise .9s var(--ease) both;}
+.w-eye{display:flex;align-items:center;gap:10px;margin-bottom:44px;}
+.w-eye-line{height:1px;width:36px;background:var(--gold);opacity:.5;}
+.w-eye span{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);opacity:.7;}
+.w-wordmark{font-family:'Cormorant Garamond',serif;font-size:clamp(68px,13vw,112px);font-weight:300;line-height:.88;letter-spacing:-4px;margin-bottom:6px;}
+.w-wordmark em{font-style:italic;color:var(--gold);}
+.w-tagline{font-family:'Cormorant Garamond',serif;font-size:clamp(13px,2vw,17px);font-weight:300;font-style:italic;color:var(--muted);letter-spacing:.5px;margin-bottom:48px;}
+.w-field{margin-bottom:20px;}
+.w-lbl{font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--muted);font-weight:500;margin-bottom:7px;display:block;}
+.w-inp{width:100%;background:transparent;border:none;border-bottom:1px solid var(--rim2);padding:11px 0;font-family:'Outfit',sans-serif;font-size:18px;font-weight:300;color:var(--text);outline:none;transition:border-color .3s;caret-color:var(--gold);}
+.w-inp:focus{border-color:var(--gold);}
+.w-inp::placeholder{color:var(--muted);font-size:15px;}
+.w-btn{width:100%;padding:17px 32px;background:var(--gold);color:var(--void);font-family:'Outfit',sans-serif;font-size:12px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;border:none;border-radius:2px;cursor:pointer;transition:all .3s var(--ease);margin-top:8px;}
+.w-btn:hover{background:var(--gold2);transform:translateY(-1px);}
+.w-btn:disabled{opacity:.35;cursor:not-allowed;transform:none;}
+.w-corner{position:absolute;width:56px;height:56px;border-color:var(--gold);border-style:solid;opacity:.15;}
+.w-tl{top:24px;left:24px;border-width:1px 0 0 1px;}
+.w-br{bottom:24px;right:24px;border-width:0 1px 1px 0;}
+
+/* ══ PERSONALITY ══ */
+#s-personality{background:var(--deep);align-items:center;justify-content:center;padding:56px 24px;}
+.p-wrap{max-width:920px;width:100%;}
+.s-eyebrow{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);opacity:.7;margin-bottom:12px;display:block;}
+.s-title{font-family:'Cormorant Garamond',serif;font-size:clamp(28px,5vw,48px);font-weight:300;line-height:1.1;margin-bottom:8px;}
+.s-title em{font-style:italic;color:var(--gold);}
+.s-sub{font-size:14px;color:var(--muted);font-weight:300;line-height:1.7;margin-bottom:40px;max-width:440px;}
+.p-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-bottom:36px;}
+.p-card{background:var(--surface);border:1px solid var(--rim);border-radius:var(--r);padding:24px 20px;cursor:pointer;transition:all .3s var(--ease);position:relative;overflow:hidden;}
+.p-card:hover{transform:translateY(-3px);border-color:var(--rim2);}
+.p-card.sel{border-color:var(--pc,var(--gold));box-shadow:0 0 0 1px var(--pc,var(--gold)),0 14px 36px color-mix(in srgb,var(--pc,var(--gold)) 16%,transparent);}
+.p-check{position:absolute;top:12px;right:12px;width:20px;height:20px;border-radius:50%;background:var(--pc,var(--gold));display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--void);font-weight:700;opacity:0;transform:scale(0);transition:all .25s var(--ease);}
+.p-card.sel .p-check{opacity:1;transform:scale(1);}
+.p-icon{font-size:24px;margin-bottom:12px;display:block;}
+.p-name{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;margin-bottom:3px;}
+.p-code{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--pc,var(--gold));margin-bottom:8px;display:block;}
+.p-desc{font-size:12px;color:var(--muted);line-height:1.6;font-weight:300;}
+.p-cta{display:flex;align-items:center;gap:18px;}
+.p-hint{font-size:13px;color:var(--muted);}
+
+/* ══ SCENE ══ */
+#s-scene{background:var(--void);align-items:center;justify-content:center;padding:56px 24px;overflow:hidden;position:relative;}
+.scene-bg{position:absolute;inset:0;background:radial-gradient(ellipse 100% 60% at 0% 100%,rgba(42,143,130,.08) 0%,transparent 50%),radial-gradient(ellipse 80% 80% at 100% 0%,rgba(200,169,110,.05) 0%,transparent 50%);}
+.scene-wrap{max-width:940px;width:100%;position:relative;z-index:2;display:grid;grid-template-columns:1fr 1.2fr;gap:56px;align-items:center;}
+@media(max-width:660px){.scene-wrap{grid-template-columns:1fr;gap:28px;}}
+.scene-fig{animation:rise .7s var(--ease) .2s both;}
+.scene-frame{width:100%;aspect-ratio:3/4;background:var(--surface);border:1px solid var(--rim);border-radius:14px;position:relative;overflow:hidden;}
+.scene-illus{position:absolute;inset:0;background:linear-gradient(135deg,#1a2040 0%,#0e1525 40%,#162030 100%);display:flex;align-items:center;justify-content:center;}
+.scene-av{width:130px;height:130px;background:linear-gradient(135deg,var(--teal),var(--deep));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:52px;box-shadow:0 18px 44px rgba(0,0,0,.5);border:2px solid rgba(42,143,130,.3);margin-bottom:36px;}
+.scene-plate{position:absolute;bottom:14px;left:14px;right:14px;background:rgba(6,7,13,.88);backdrop-filter:blur(12px);border:1px solid var(--rim2);border-radius:7px;padding:9px 13px;}
+.scene-cname{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:600;}
+.scene-crole{font-size:10px;color:var(--teal2);letter-spacing:1px;text-transform:uppercase;font-weight:500;margin-top:2px;}
+.scene-dial-wrap{animation:rise .7s var(--ease) .35s both;}
+.scene-badge{display:inline-flex;align-items:center;gap:7px;background:rgba(200,169,110,.08);border:1px solid rgba(200,169,110,.2);border-radius:100px;padding:5px 12px;margin-bottom:18px;}
+.scene-badge .dot{width:5px;height:5px;background:var(--gold);border-radius:50%;animation:pulse 2s infinite;}
+.scene-badge span{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);font-weight:600;}
+.scene-co{font-family:'Cormorant Garamond',serif;font-size:clamp(24px,3.5vw,38px);font-weight:300;margin-bottom:12px;line-height:1.15;}
+.scene-co em{font-style:italic;color:var(--gold);}
+.dial-box{background:var(--surface);border:1px solid var(--rim);border-left:2px solid var(--teal);border-radius:0 var(--r) var(--r) 0;padding:20px 24px;margin:18px 0;}
+.dial-text{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:400;font-style:italic;line-height:1.7;}
+.hl{color:var(--gold);font-style:normal;font-weight:600;}
+.scene-ctx{font-size:13px;color:var(--muted);line-height:1.8;font-weight:300;margin-bottom:24px;}
+.scene-ctx strong{color:var(--text);font-weight:500;}
+
+/* ══ VIDEO ══ */
+#s-video{background:var(--deep);align-items:center;justify-content:center;padding:56px 24px;}
+.video-wrap{max-width:620px;width:100%;}
+.video-stage{background:var(--void);border:1px solid var(--rim);border-radius:13px;overflow:hidden;margin:24px 0;}
+.video-topbar{background:var(--surface);border-bottom:1px solid var(--rim);padding:10px 16px;display:flex;align-items:center;gap:9px;}
+.vbar-dot{width:7px;height:7px;border-radius:50%;background:var(--teal);animation:pulse 2s infinite;}
+.vbar-label{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1px;}
+.video-tabs{display:grid;grid-template-columns:repeat(5,1fr);border-bottom:1px solid var(--rim);}
+.vtab{padding:10px 5px;text-align:center;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;border-right:1px solid var(--rim);transition:all .22s;background:var(--surface);letter-spacing:.5px;}
+.vtab:last-child{border-right:none;}
+.vtab:hover{background:var(--lift);color:var(--text);}
+.vtab.active{background:var(--void);color:var(--gold);border-bottom:1px solid var(--gold);}
+.vtab.watched{color:var(--teal2);}
+.video-player{min-height:240px;display:flex;align-items:center;justify-content:center;background:var(--void);padding:14px;}
+.vplay{display:flex;flex-direction:column;align-items:center;gap:12px;cursor:pointer;background:none;border:none;padding:20px;transition:transform .3s var(--ease);}
+.vplay:hover{transform:scale(1.04);}
+.vplay-ring{width:66px;height:66px;border-radius:50%;border:1px solid var(--gold);display:flex;align-items:center;justify-content:center;position:relative;animation:glow 3s infinite;}
+.vplay-ring::before{content:'';position:absolute;inset:6px;background:var(--gold);border-radius:50%;opacity:.1;}
+.vplay-icon{font-size:24px;margin-left:3px;}
+.vplay-title{font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--text);text-align:center;}
+.vplay-sub{font-size:10px;color:var(--muted);letter-spacing:1px;}
+.vwatched-badge{display:none;align-items:center;gap:6px;padding:5px 11px;border-radius:100px;background:rgba(42,143,130,.1);border:1px solid rgba(42,143,130,.25);color:var(--teal2);font-size:11px;font-weight:600;letter-spacing:.5px;}
+.vwatched-badge.show{display:flex;}
+
+/* video modal */
+.vmodal{display:none;position:fixed;inset:0;z-index:8500;background:rgba(0,0,0,.96);align-items:center;justify-content:flex-start;flex-direction:column;padding:12px;overflow-y:auto;}
+.vmodal.open{display:flex;animation:fade .3s ease;}
+.vmodal-inner{width:100%;max-width:330px;background:var(--surface);border-radius:var(--r);overflow:hidden;box-shadow:0 40px 100px rgba(0,0,0,.9);margin-top:6px;}
+.vmodal-head{display:flex;align-items:center;justify-content:space-between;padding:11px 15px;border-bottom:1px solid var(--rim);}
+.vmodal-title{font-size:13px;font-weight:600;}
+.vmodal-close{width:27px;height:27px;border-radius:5px;background:var(--rim);border:none;color:var(--text);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s;}
+.vmodal-close:hover{background:rgba(212,82,42,.3);}
+.vmodal-frame{position:relative;width:100%;padding-bottom:177.78%;}
+.vmodal-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:none;}
+.vmodal-foot{padding:9px 15px;text-align:center;font-size:10px;color:var(--muted);letter-spacing:.5px;}
+
+/* ══ SCENARIO ══ */
+#s-scenario{background:var(--void);flex-direction:column;}
+.sc-topbar{background:var(--surface);border-bottom:1px solid var(--rim);padding:13px 26px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;position:sticky;top:0;z-index:200;}
+.sc-logo{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;letter-spacing:-.5px;}
+.sc-logo em{font-style:italic;color:var(--gold);}
+.sc-lbadge{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);padding:3px 7px;border:1px solid var(--rim);border-radius:3px;}
+.sc-pips{display:flex;gap:5px;}
+.sc-pip{width:26px;height:3px;border-radius:2px;background:var(--rim);transition:background .4s;}
+.sc-pip.done{background:var(--teal);}
+.sc-pip.active{background:var(--gold);}
+.sc-body{flex:1;padding:40px 26px;max-width:760px;width:100%;margin:0 auto;}
+.level-panel{display:none;animation:rise .5s var(--ease);}
+.level-panel.active{display:block;}
+.lv-num{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--ember);display:block;margin-bottom:6px;}
+.lv-title{font-family:'Cormorant Garamond',serif;font-size:clamp(22px,4vw,36px);font-weight:300;line-height:1.15;margin-bottom:9px;}
+.lv-title em{font-style:italic;color:var(--gold);}
+.lv-brief{font-size:13px;color:var(--muted);line-height:1.8;font-weight:300;margin-bottom:28px;max-width:560px;}
+
+/* DND */
+.dnd-wrap{background:var(--surface);border:1px solid var(--rim);border-radius:13px;padding:22px;margin-bottom:20px;}
+.dnd-cols{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+@media(max-width:520px){.dnd-cols{grid-template-columns:1fr;}}
+.dnd-zone-lbl{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:7px;font-weight:600;}
+.dnd-src{display:flex;flex-direction:column;gap:6px;}
+.dnd-zone{min-height:130px;border-radius:8px;border:1.5px dashed var(--rim2);padding:9px;transition:all .22s;}
+.dnd-zone.hover{border-color:var(--teal);background:rgba(42,143,130,.04);}
+.dnd-drop-list{display:flex;flex-direction:column;gap:6px;}
+.dnd-ph{border:1.5px dashed rgba(255,255,255,.06);border-radius:6px;padding:8px 11px;font-size:11px;color:var(--muted);text-align:center;font-style:italic;}
+.dnd-item{background:var(--lift);border:1px solid var(--rim2);border-radius:6px;padding:8px 11px;font-size:12px;cursor:grab;user-select:none;transition:all .18s;display:flex;align-items:center;gap:6px;}
+.dnd-item:hover{transform:translateX(2px);}
+.dnd-item.dragging{opacity:.35;}
+.dnd-grip{color:var(--muted);font-size:9px;flex-shrink:0;}
+
+/* MC */
+.mc-card{background:var(--surface);border:1px solid var(--rim);border-left:2px solid var(--ember);border-radius:0 var(--r) var(--r) 0;padding:18px 22px;margin-bottom:20px;}
+.mc-card-lbl{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--ember);font-weight:600;margin-bottom:5px;display:block;}
+.mc-card-text{font-family:'Cormorant Garamond',serif;font-size:16px;line-height:1.7;}
+.mc-opts{display:flex;flex-direction:column;gap:9px;margin-bottom:20px;}
+.mc-opt{background:var(--surface);border:1px solid var(--rim);border-radius:var(--r);padding:13px 16px;cursor:pointer;transition:all .22s;display:flex;align-items:flex-start;gap:11px;}
+.mc-opt:hover:not(.locked){border-color:var(--rim2);background:var(--lift);}
+.mc-opt.sel{border-color:var(--gold);background:rgba(200,169,110,.06);}
+.mc-opt.correct{border-color:var(--teal);background:rgba(42,143,130,.07);}
+.mc-opt.wrong{border-color:var(--ember);background:rgba(212,82,42,.05);}
+.mc-opt.locked{cursor:not-allowed;opacity:.45;}
+.mc-key{width:24px;height:24px;border-radius:5px;flex-shrink:0;background:var(--rim);border:1px solid var(--rim2);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);font-weight:600;transition:all .22s;}
+.mc-opt.sel .mc-key{background:var(--gold);color:var(--void);border-color:var(--gold);}
+.mc-opt.correct .mc-key{background:var(--teal);color:#fff;border-color:var(--teal);}
+.mc-opt.wrong .mc-key{background:var(--ember);color:#fff;border-color:var(--ember);}
+.mc-text{font-size:13px;line-height:1.6;color:var(--text);font-weight:300;padding-top:2px;}
+
+/* DIALOGUE */
+.dial-scene{background:var(--surface);border:1px solid var(--rim);border-radius:13px;overflow:hidden;margin-bottom:18px;}
+.dial-head{background:var(--lift);border-bottom:1px solid var(--rim);padding:11px 16px;display:flex;align-items:center;gap:9px;}
+.dial-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--ember),#8b2010);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.dial-info h4{font-size:13px;font-weight:600;}
+.dial-info p{font-size:10px;color:var(--ember2);letter-spacing:.5px;}
+.dial-limit-bar{height:3px;background:var(--rim);}
+.dial-limit-fill{height:100%;background:var(--gold);border-radius:2px;transition:width .4s,background .4s;}
+.dial-msgs{padding:16px;display:flex;flex-direction:column;gap:12px;min-height:160px;max-height:280px;overflow-y:auto;}
+.dial-msgs::-webkit-scrollbar{width:3px;}
+.dial-msgs::-webkit-scrollbar-thumb{background:var(--rim2);}
+.dmsg{display:flex;gap:7px;max-width:88%;}
+.dmsg.char{align-self:flex-start;}
+.dmsg.me{align-self:flex-end;flex-direction:row-reverse;}
+.dbubble{padding:9px 13px;border-radius:9px;font-size:13px;line-height:1.6;font-weight:300;}
+.dmsg.char .dbubble{background:var(--lift);border:1px solid var(--rim);color:var(--text);border-radius:3px 9px 9px 9px;}
+.dmsg.me .dbubble{background:rgba(200,169,110,.1);border:1px solid rgba(200,169,110,.18);color:var(--text);border-radius:9px 3px 9px 9px;}
+.dial-typing-ind{display:none;align-self:flex-start;}
+.dial-typing-ind.show{display:flex;}
+.dial-dots{background:var(--lift);border:1px solid var(--rim);border-radius:3px 9px 9px 9px;padding:9px 13px;display:flex;gap:4px;align-items:center;}
+.dial-dots span{width:5px;height:5px;background:var(--muted);border-radius:50%;animation:shimmer 1.4s infinite;}
+.dial-dots span:nth-child(2){animation-delay:.2s;}
+.dial-dots span:nth-child(3){animation-delay:.4s;}
+.dial-irow{display:flex;gap:7px;padding:12px 16px;border-top:1px solid var(--rim);}
+.dial-input{flex:1;background:var(--lift);border:1px solid var(--rim);border-radius:6px;padding:8px 12px;color:var(--text);font-size:13px;font-family:'Outfit',sans-serif;outline:none;resize:none;min-height:36px;max-height:88px;font-weight:300;transition:border-color .3s;}
+.dial-input:focus{border-color:var(--rim2);}
+.dial-send{width:36px;height:36px;border-radius:6px;flex-shrink:0;background:var(--gold);border:none;color:var(--void);font-size:14px;cursor:pointer;transition:all .22s;display:flex;align-items:center;justify-content:center;font-weight:700;}
+.dial-send:hover{background:var(--gold2);}
+.dial-send:disabled{background:var(--rim);cursor:not-allowed;}
+
+/* inline video rec (inside level) */
+.inline-vid-rec{display:none;background:rgba(212,82,42,.06);border:1px solid rgba(212,82,42,.2);border-radius:var(--r);padding:16px 18px;margin-bottom:18px;}
+.inline-vid-rec.show{display:block;}
+.ivr-lbl{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--ember);font-weight:600;margin-bottom:6px;display:block;}
+.ivr-text{font-size:13px;color:var(--text);line-height:1.6;margin-bottom:12px;font-weight:300;}
+.ivr-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:var(--ember);color:#fff;border:none;border-radius:4px;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:background .22s;}
+.ivr-btn:hover{background:var(--ember2);}
+
+/* feedback block */
+.fb-block{padding:13px 17px;background:var(--surface);border:1px solid var(--rim);border-radius:var(--r);margin-bottom:16px;}
+.fb-lbl{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;display:block;}
+.fb-text{font-family:'Cormorant Garamond',serif;font-size:14px;font-style:italic;line-height:1.6;}
+
+/* results */
+.r-card{background:var(--surface);border:1px solid var(--rim);border-radius:var(--r);padding:16px;}
+.r-card-lbl{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:5px;display:block;}
+.r-card-val{font-family:'Cormorant Garamond',serif;font-size:21px;font-weight:600;margin-bottom:3px;}
+.r-card-sub{font-size:11px;color:var(--muted);}
+.r-nexus{background:var(--surface);border:1px solid var(--rim);border-left:2px solid var(--teal);border-radius:0 var(--r) var(--r) 0;padding:20px 24px;margin-bottom:24px;}
+.r-nexus-lbl{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--teal2);font-weight:600;margin-bottom:9px;display:block;}
+.r-nexus-text{font-family:'Cormorant Garamond',serif;font-size:15px;font-style:italic;line-height:1.7;}
+.email-status{padding:9px 14px;border-radius:7px;font-size:12px;margin-bottom:16px;display:none;}
+.email-status.ok{background:rgba(42,143,130,.1);border:1px solid rgba(42,143,130,.25);color:var(--teal2);}
+.email-status.err{background:rgba(212,82,42,.07);border:1px solid rgba(212,82,42,.2);color:var(--ember2);}
+
+/* ══ SHARED BUTTONS ══ */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:12px 24px;border:none;border-radius:2px;font-family:'Outfit',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .28s var(--ease);}
+.btn-gold{background:var(--gold);color:var(--void);}
+.btn-gold:hover{background:var(--gold2);transform:translateY(-1px);}
+.btn-ghost{background:transparent;color:var(--text);border:1px solid var(--rim2);}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold);}
+.btn-teal{background:var(--teal);color:#fff;}
+.btn-teal:hover{background:var(--teal2);}
+.btn:disabled{opacity:.35;cursor:not-allowed;transform:none!important;}
+
+/* curtain */
+.curtain{position:fixed;inset:0;z-index:7000;background:var(--void);pointer-events:none;opacity:0;transition:opacity .35s ease;}
+.curtain.closing{opacity:1;}
+
+/* ══════════════════════════════════════════════
+   NEXUS FLOATING WIDGET
+   position:fixed — never in document flow
+   present from personality selection onward
+══════════════════════════════════════════════ */
+#nexus-widget{
+  position:fixed;
+  bottom:28px;right:28px;
+  z-index:9000;
+  display:none; /* shown via JS after personality confirmed */
+}
+#nexus-widget.visible{display:block;}
+
+/* collapsed bubble */
+.nx-bubble{
+  width:56px;height:56px;
+  border-radius:50%;
+  background:linear-gradient(135deg,var(--teal),#1a5e56);
+  box-shadow:0 6px 24px rgba(42,143,130,.45);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+  font-size:22px;
+  transition:all .3s var(--ease);
+  position:relative;
+}
+.nx-bubble:hover{transform:scale(1.08);}
+.nx-badge{
+  position:absolute;top:-4px;right:-4px;
+  width:16px;height:16px;border-radius:50%;
+  background:var(--ember);border:2px solid var(--void);
+  display:none;
+}
+.nx-badge.show{display:block;animation:nxBadge 1.5s infinite;}
+
+/* expanded panel */
+.nx-panel{
+  position:absolute;bottom:68px;right:0;
+  width:300px;
+  background:rgba(11,13,26,0.97);
+  backdrop-filter:blur(20px);
+  border:1px solid var(--rim2);
+  border-radius:14px;
+  box-shadow:0 24px 64px rgba(0,0,0,.8);
+  overflow:hidden;
+  display:none;
+  animation:nxPop .35s var(--ease);
+}
+.nx-panel.open{display:flex;flex-direction:column;}
+
+.nx-panel-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 14px;
+  border-bottom:1px solid var(--rim);
+  background:var(--surface);
+}
+.nx-panel-id{display:flex;align-items:center;gap:8px;}
+.nx-panel-icon{width:30px;height:30px;border-radius:7px;background:linear-gradient(135deg,var(--teal),#1a5e56);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+.nx-panel-name{font-family:'Cormorant Garamond',serif;font-size:13px;font-weight:600;color:var(--teal2);}
+.nx-panel-role{font-size:9px;color:var(--muted);letter-spacing:.5px;}
+.nx-close{width:26px;height:26px;border-radius:5px;background:var(--rim);border:none;color:var(--muted);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s;}
+.nx-close:hover{background:var(--rim2);}
+
+.nx-msgs{
+  max-height:260px;overflow-y:auto;
+  padding:14px;display:flex;flex-direction:column;gap:10px;
+}
+.nx-msgs::-webkit-scrollbar{width:3px;}
+.nx-msgs::-webkit-scrollbar-thumb{background:var(--rim2);}
+.nx-msg{animation:nxPop .35s var(--ease);}
+.nx-msg-tag{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--teal2);font-weight:600;margin-bottom:3px;display:block;}
+.nx-msg-text{font-family:'Cormorant Garamond',serif;font-size:13px;font-style:italic;color:var(--text);line-height:1.6;}
+.nx-msg-text .hl{font-style:normal;color:var(--gold);font-weight:600;}
+.nx-divider{height:1px;background:var(--rim);flex-shrink:0;}
+
+/* inline video rec inside widget */
+.nx-vid-rec{
+  margin:0 14px 14px;
+  background:rgba(212,82,42,.07);
+  border:1px solid rgba(212,82,42,.2);
+  border-radius:8px;padding:12px 14px;
+  display:none;
+}
+.nx-vid-rec.show{display:block;}
+.nx-vid-rec-lbl{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--ember);font-weight:600;margin-bottom:5px;display:block;}
+.nx-vid-rec-text{font-size:12px;color:var(--text);line-height:1.5;margin-bottom:10px;font-weight:300;}
+.nx-vid-btn{display:flex;align-items:center;gap:6px;padding:7px 12px;background:var(--ember);color:#fff;border:none;border-radius:3px;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:background .2s;width:100%;justify-content:center;}
+.nx-vid-btn:hover{background:var(--ember2);}
+
+/* retry prompt inside widget */
+.nx-retry-row{
+  padding:10px 14px;border-top:1px solid var(--rim);
+  display:none;
+}
+.nx-retry-row.show{display:flex;gap:8px;flex-wrap:wrap;}
+
+@media(max-width:420px){
+  #nexus-widget{bottom:16px;right:16px;}
+  .nx-panel{width:calc(100vw - 32px);right:-12px;}
+}
+</style>
+</head>
+<body>
+<div class="curtain" id="curtain"></div>
+
+<!-- ════════════════════════ WELCOME ════════════════════════ -->
+<section class="screen active" id="s-welcome">
+  <div class="w-bg"></div><div class="w-grid"></div><div class="w-scan"></div>
+  <div class="w-corner w-tl"></div><div class="w-corner w-br"></div>
+  <div class="w-content">
+    <div class="w-eye"><div class="w-eye-line"></div><span>Applied Learning Platform</span><div class="w-eye-line"></div></div>
+    <h1 class="w-wordmark">N<em>e</em>xus</h1>
+    <p class="w-tagline">Critical Thinking at Work — Meridian Corp</p>
+    <div class="w-field">
+      <label class="w-lbl" for="inp-name">Full Name</label>
+      <input class="w-inp" id="inp-name" type="text" placeholder="Your full name" autocomplete="off">
+    </div>
+    <div class="w-field">
+      <label class="w-lbl" for="inp-email">Email Address</label>
+      <input class="w-inp" id="inp-email" type="email" placeholder="your@email.com" autocomplete="off">
+    </div>
+    <button class="w-btn" id="welcome-btn" onclick="startJourney()" disabled>Begin Experience</button>
+  </div>
+</section>
+
+<!-- ════════════════════════ PERSONALITY ════════════════════════ -->
+<section class="screen" id="s-personality">
+ <div style="padding:52px 24px;display:flex;align-items:center;justify-content:center;min-height:100vh;">
+ <div class="p-wrap">
+  <span class="s-eyebrow">Step 1 of 4</span>
+  <h2 class="s-title">How do you <em>think?</em></h2>
+  <p class="s-sub" id="p-sub">Select the profile that best describes your natural approach to problems.</p>
+  <div class="p-grid">
+    <div class="p-card" style="--pc:#d4522a" onclick="selectProfile(this,'Driver')" data-p="Driver">
+      <div class="p-check">✓</div><span class="p-icon">🚀</span>
+      <div class="p-name">Driver</div><span class="p-code">Action · Results · Speed</span>
+      <p class="p-desc">You move fast, decide quickly, and want results. Processes that slow you down frustrate you.</p>
+    </div>
+    <div class="p-card" style="--pc:#4f8ef7" onclick="selectProfile(this,'Analyst')" data-p="Analyst">
+      <div class="p-check">✓</div><span class="p-icon">🔬</span>
+      <div class="p-name">Analyst</div><span class="p-code">Evidence · Structure · Precision</span>
+      <p class="p-desc">You need data before you decide. You systematically evaluate and question assumptions.</p>
+    </div>
+    <div class="p-card" style="--pc:#2a8f82" onclick="selectProfile(this,'Amiable')" data-p="Amiable">
+      <div class="p-check">✓</div><span class="p-icon">🤝</span>
+      <div class="p-name">Amiable</div><span class="p-code">People · Harmony · Care</span>
+      <p class="p-desc">You think about people first. Decisions matter because of who they affect.</p>
+    </div>
+    <div class="p-card" style="--pc:#c8a96e" onclick="selectProfile(this,'Expressive')" data-p="Expressive">
+      <div class="p-check">✓</div><span class="p-icon">✦</span>
+      <div class="p-name">Expressive</div><span class="p-code">Story · Vision · Meaning</span>
+      <p class="p-desc">You see the big picture. Ideas energise you and narratives move you to act.</p>
+    </div>
+  </div>
+  <div class="p-cta">
+    <button class="btn btn-gold" id="p-btn" onclick="confirmProfile()" disabled>Confirm My Profile →</button>
+    <span class="p-hint" id="p-hint">Select a profile to continue</span>
+  </div>
+ </div>
+ </div>
+</section>
+
+<!-- ════════════════════════ SCENE ════════════════════════ -->
+<section class="screen" id="s-scene">
+  <div class="scene-bg"></div>
+  <div style="padding:52px 24px;display:flex;align-items:center;justify-content:center;min-height:100vh;">
+  <div class="scene-wrap">
+    <div class="scene-fig">
+      <div class="scene-frame">
+        <div class="scene-illus"><div class="scene-av">👩🏾‍💼</div></div>
+        <div class="scene-plate"><div class="scene-cname">Amara Osei</div><div class="scene-crole">Chief Operations Officer · Meridian Corp</div></div>
+      </div>
+    </div>
+    <div class="scene-dial-wrap">
+      <div class="scene-badge"><span class="dot"></span><span>Meridian Corp</span></div>
+      <h2 class="scene-co">Welcome to <em>Meridian.</em></h2>
+      <div class="dial-box">
+        <p class="dial-text">"<span class="hl" id="scene-name-span"></span>, I'm glad you're here. Meridian Corp has been growing fast — but fast growth has a cost. Our teams are burning out, deadlines are slipping, and nobody can agree on why. We need someone who can think clearly under pressure. That someone is you."</p>
+      </div>
+      <p class="scene-ctx"><strong>Meridian Corp</strong> is a mid-sized operations consultancy in West Africa. Rapid expansion has strained internal processes — missed deadlines, unclear accountability, and burnout have reached a critical point. Leadership has one week to present a solution to the board.<br><br>Your role: <strong>Senior Analyst, Special Projects.</strong></p>
+      <button class="btn btn-gold" onclick="goScene('s-video',initVideoScreen)">Accept the Assignment →</button>
+    </div>
+  </div>
+  </div>
+</section>
+
+<!-- ════════════════════════ VIDEO ════════════════════════ -->
+<section class="screen" id="s-video">
+  <div style="padding:52px 24px;display:flex;align-items:center;justify-content:center;min-height:100vh;">
+  <div class="video-wrap">
+    <span class="s-eyebrow">Briefing Room</span>
+    <h2 class="s-title" style="margin-bottom:6px;">Your <em>intelligence</em> briefing</h2>
+    <p class="s-sub">Watch all five modules. Nexus will guide you before and after each one.</p>
+    <div class="video-stage">
+      <div class="video-topbar">
+        <div class="vbar-dot"></div>
+        <span class="vbar-label">Meridian Corp · <span id="vbar-prog">0/5 watched</span></span>
+      </div>
+      <div class="video-tabs" id="video-tabs">
+        <div class="vtab active" id="vtab-1" onclick="selectVid(1)">01</div>
+        <div class="vtab" id="vtab-2" onclick="selectVid(2)">02</div>
+        <div class="vtab" id="vtab-3" onclick="selectVid(3)">03</div>
+        <div class="vtab" id="vtab-4" onclick="selectVid(4)">04</div>
+        <div class="vtab" id="vtab-5" onclick="selectVid(5)">05</div>
+      </div>
+      <div class="video-player">
+        <button class="vplay" id="vplay-btn" onclick="openVid(ST.curVid)">
+          <div class="vplay-ring"><span class="vplay-icon">▶</span></div>
+          <div>
+            <div class="vplay-title" id="vplay-title">Thinking Beyond Routine</div>
+            <div class="vplay-sub" id="vplay-sub">MODULE 01 · TAP TO WATCH</div>
+          </div>
+        </button>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+      <div class="vwatched-badge" id="all-watched-badge">✓ All modules watched</div>
+      <button class="btn btn-gold" id="video-next-btn" onclick="proceedToScenario()" disabled>Enter the Investigation →</button>
+    </div>
+  </div>
+  </div>
+</section>
+
+<!-- VIDEO MODAL -->
+<div class="vmodal" id="vmodal" onclick="handleVclick(event)">
+  <div class="vmodal-inner" id="vmodal-inner">
+    <div class="vmodal-head">
+      <span class="vmodal-title" id="vmodal-title"></span>
+      <button class="vmodal-close" onclick="closeVid()">✕</button>
+    </div>
+    <div class="vmodal-frame">
+      <iframe id="vmodal-iframe" src="" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture;web-share"></iframe>
+    </div>
+    <div class="vmodal-foot">Press ✕ or tap outside to return</div>
+  </div>
+</div>
+
+<!-- ════════════════════════ SCENARIO ════════════════════════ -->
+<section class="screen" id="s-scenario">
+  <div class="sc-topbar">
+    <div style="display:flex;align-items:center;gap:11px;">
+      <div class="sc-logo">N<em>e</em>xus</div>
+      <div class="sc-lbadge" id="sc-lbadge">Level 1</div>
+    </div>
+    <div class="sc-pips">
+      <div class="sc-pip active" id="pip-1"></div>
+      <div class="sc-pip" id="pip-2"></div>
+      <div class="sc-pip" id="pip-3"></div>
+      <div class="sc-pip" id="pip-4"></div>
+    </div>
+  </div>
+
+  <div class="sc-body">
+
+    <!-- LEVEL 1 -->
+    <div class="level-panel active" id="level-1">
+      <div class="lv-num">Level 01 · Identify the Problem</div>
+      <h3 class="lv-title">What is <em>really</em> broken at Meridian?</h3>
+      <p class="lv-brief">Drag each finding into the correct category — <strong>Root Cause</strong> or <strong>Surface Symptom</strong>. Real improvement requires targeting causes, not symptoms.</p>
+      <div class="dnd-wrap">
+        <div class="dnd-cols">
+          <div>
+            <div class="dnd-zone-lbl">Drag from here</div>
+            <div class="dnd-src" id="dnd-src">
+              <div class="dnd-item" draggable="true" data-id="a" data-correct="cause"><span class="dnd-grip">⠿</span>Two-hour Monday meetings with no clear agenda</div>
+              <div class="dnd-item" draggable="true" data-id="b" data-correct="symptom"><span class="dnd-grip">⠿</span>Teams missing deadlines consistently</div>
+              <div class="dnd-item" draggable="true" data-id="c" data-correct="cause"><span class="dnd-grip">⠿</span>Three approval layers for routine decisions</div>
+              <div class="dnd-item" draggable="true" data-id="d" data-correct="symptom"><span class="dnd-grip">⠿</span>Staff reporting burnout and fatigue</div>
+              <div class="dnd-item" draggable="true" data-id="e" data-correct="cause"><span class="dnd-grip">⠿</span>Manual spreadsheet updates across departments</div>
+              <div class="dnd-item" draggable="true" data-id="f" data-correct="symptom"><span class="dnd-grip">⠿</span>Productivity scores dropping quarter on quarter</div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <div>
+              <div class="dnd-zone-lbl" style="color:var(--ember)">Root Causes</div>
+              <div class="dnd-zone" id="drop-cause" ondragover="dndOver(event)" ondragleave="dndLeave(event)" ondrop="dndDrop(event,'cause')"><div class="dnd-ph">Drop root causes here</div></div>
+            </div>
+            <div>
+              <div class="dnd-zone-lbl" style="color:var(--teal2)">Surface Symptoms</div>
+              <div class="dnd-zone" id="drop-symptom" ondragover="dndOver(event)" ondragleave="dndLeave(event)" ondrop="dndDrop(event,'symptom')"><div class="dnd-ph">Drop symptoms here</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- inline video rec for level 1 wrong answer -->
+      <div class="inline-vid-rec" id="l1-vid-rec">
+        <span class="ivr-lbl">Nexus Recommends</span>
+        <p class="ivr-text" id="l1-vid-rec-text"></p>
+        <button class="ivr-btn" onclick="openVidInline(3)">▶ Watch Module 03</button>
+      </div>
+      <div id="dnd-fb" style="display:none;margin-bottom:16px;"></div>
+      <div style="display:flex;gap:9px;flex-wrap:wrap;">
+        <button class="btn btn-gold" id="dnd-check" onclick="checkDnd()" disabled>Check Answers</button>
+        <button class="btn btn-ghost" id="dnd-retry" onclick="resetLevel1()" style="display:none;">↩ Retry Level</button>
+        <button class="btn btn-ghost" id="dnd-next" onclick="advanceToLevel(2)" style="display:none;">Continue →</button>
+      </div>
+    </div>
+
+    <!-- LEVEL 2 -->
+    <div class="level-panel" id="level-2">
+      <div class="lv-num">Level 02 · Evaluate the Evidence</div>
+      <h3 class="lv-title">The data is <em>conflicting.</em></h3>
+      <p class="lv-brief">Management says the Monday meeting drives accountability. Your data says something different. Choose the most defensible course of action.</p>
+      <div class="mc-card">
+        <span class="mc-card-lbl">Situation Report</span>
+        <p class="mc-card-text">Following your root cause analysis, you present findings to the Operations Director. He insists the two-hour Monday meeting is "essential for alignment." However, an anonymous staff survey shows 78% consider it the least productive part of their week. Three departments that piloted asynchronous updates last quarter showed a 22% improvement in on-time delivery. Leadership wants a recommendation before Friday's board meeting.</p>
+      </div>
+      <div class="mc-opts" id="mc-opts">
+        <div class="mc-opt" onclick="selMc(this,0)" data-correct="false" data-idx="0"><div class="mc-key">A</div><div class="mc-text">Keep the Monday meeting. The Operations Director has more context than the survey and changing it could damage leadership trust.</div></div>
+        <div class="mc-opt" onclick="selMc(this,1)" data-correct="true"  data-idx="1"><div class="mc-key">B</div><div class="mc-text">Recommend a structured pilot: replace the Monday meeting with async updates for two departments over four weeks, then compare delivery data before scaling.</div></div>
+        <div class="mc-opt" onclick="selMc(this,2)" data-correct="false" data-idx="2"><div class="mc-key">C</div><div class="mc-text">Cancel all meetings immediately. The survey and delivery data are clear — action is needed now, not more deliberation.</div></div>
+        <div class="mc-opt" onclick="selMc(this,3)" data-correct="false" data-idx="3"><div class="mc-key">D</div><div class="mc-text">Commission a full independent audit before making any recommendation. No change should happen without complete information.</div></div>
+      </div>
+      <!-- inline video rec for level 2 wrong -->
+      <div class="inline-vid-rec" id="l2-vid-rec">
+        <span class="ivr-lbl">Nexus Recommends</span>
+        <p class="ivr-text" id="l2-vid-rec-text"></p>
+        <button class="ivr-btn" onclick="openVidInline(4)">▶ Watch Module 04</button>
+      </div>
+      <div id="mc-fb" style="display:none;margin-bottom:16px;"></div>
+      <div style="display:flex;gap:9px;flex-wrap:wrap;">
+        <button class="btn btn-gold" id="mc-submit" onclick="submitMc()" disabled>Submit Answer</button>
+        <button class="btn btn-ghost" id="mc-retry" onclick="resetLevel2()" style="display:none;">↩ Retry Level</button>
+        <button class="btn btn-ghost" id="mc-next" onclick="advanceToLevel(3)" style="display:none;">Continue →</button>
+      </div>
+    </div>
+
+    <!-- LEVEL 3 -->
+    <div class="level-panel" id="level-3">
+      <div class="lv-num">Level 03 · Navigate the Conversation</div>
+      <h3 class="lv-title">Marcus is <em>resisting.</em></h3>
+      <p class="lv-brief">Marcus Adeyemi runs the Monday meetings and feels threatened. Engage him thoughtfully. You have <strong>8 exchanges</strong> before the situation escalates.</p>
+      <div class="dial-scene">
+        <div class="dial-head">
+          <div class="dial-avatar">👨🏾</div>
+          <div class="dial-info"><h4>Marcus Adeyemi</h4><p>Team Lead · Operations · Resistant</p></div>
+          <div style="margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);" id="dial-counter">8 left</div>
+        </div>
+        <div class="dial-limit-bar"><div class="dial-limit-fill" id="dial-fill" style="width:100%"></div></div>
+        <div class="dial-msgs" id="dial-msgs">
+          <div class="dmsg char"><div class="dbubble">Look, I don't know what this "investigation" is supposed to prove. My team has run this process for three years. We know what works.</div></div>
+          <div class="dial-typing-ind" id="dial-typing"><div class="dial-dots"><span></span><span></span><span></span></div></div>
+        </div>
+        <div class="dial-irow">
+          <textarea class="dial-input" id="dial-inp" placeholder="Respond to Marcus thoughtfully..." rows="1"></textarea>
+          <button class="dial-send" id="dial-send-btn" onclick="sendDial()">↑</button>
+        </div>
+      </div>
+      <div id="dial-fb" style="display:none;margin-bottom:14px;"></div>
+      <button class="btn btn-ghost" id="dial-next" style="display:none;">View Results →</button>
+    </div>
+
+    <!-- LEVEL 4 -->
+    <div class="level-panel" id="level-4">
+      <div class="lv-num">Level 04 · Mission Debrief</div>
+      <h3 class="lv-title">Your <em>recommendation</em> is in.</h3>
+      <p class="lv-brief" style="margin-bottom:28px;">Here is how your critical thinking performed across the investigation.</p>
+      <div style="text-align:center;padding:28px 0;border-bottom:1px solid var(--rim);margin-bottom:28px;">
+        <span style="font-family:'Cormorant Garamond',serif;font-size:88px;font-weight:300;line-height:1;color:var(--gold);display:block;" id="lv4-grade">—</span>
+        <span style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);font-weight:600;" id="lv4-label">Calculating...</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:11px;margin-bottom:24px;">
+        <div class="r-card"><span class="r-card-lbl">Root Cause Analysis</span><div class="r-card-val" id="r1">—</div><div class="r-card-sub">Level 1</div></div>
+        <div class="r-card"><span class="r-card-lbl">Evidence Evaluation</span><div class="r-card-val" id="r2">—</div><div class="r-card-sub">Level 2</div></div>
+        <div class="r-card"><span class="r-card-lbl">Dialogue Quality</span><div class="r-card-val" id="r3">—</div><div class="r-card-sub">Level 3</div></div>
+        <div class="r-card"><span class="r-card-lbl">Thinking Profile</span><div class="r-card-val" id="r4">—</div><div class="r-card-sub">Selected</div></div>
+      </div>
+      <div class="r-nexus">
+        <span class="r-nexus-lbl">Nexus · Final Assessment</span>
+        <p class="r-nexus-text" id="r-summary">Generating your personalised assessment...</p>
+      </div>
+      <div class="email-status" id="email-status"></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="btn btn-gold" onclick="sendResults()">📧 Email My Results</button>
+        <button class="btn btn-ghost" onclick="restartAll()">Start Again</button>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- CONSEQUENCE OVERLAY -->
+<div id="consequence-overlay" style="display:none;position:fixed;inset:0;z-index:8000;background:rgba(6,7,13,.97);align-items:center;justify-content:center;padding:24px;">
+  <div style="max-width:520px;width:100%;background:var(--surface);border:1px solid var(--rim);border-radius:var(--r);padding:32px;text-align:left;">
+    <div id="consequence-icon" style="font-size:40px;margin-bottom:16px;">⚠</div>
+    <div id="consequence-title" style="font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:300;margin-bottom:12px;"></div>
+    <p id="consequence-narrative" style="font-family:'Cormorant Garamond',serif;font-size:16px;font-style:italic;line-height:1.8;color:var(--text);margin-bottom:24px;"></p>
+    <p id="consequence-nexus-note" style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:28px;font-weight:300;"></p>
+    <button id="consequence-btn" class="btn btn-gold" style="width:100%;justify-content:center;"></button>
+  </div>
+</div>
+
+<!-- ════════════ NEXUS FLOATING WIDGET ════════════ -->
+<div id="nexus-widget">
+  <!-- collapsed bubble -->
+  <div class="nx-bubble" id="nx-bubble" onclick="toggleNexus()">
+    🧠
+    <div class="nx-badge" id="nx-badge"></div>
+  </div>
+  <!-- expanded panel -->
+  <div class="nx-panel" id="nx-panel">
+    <div class="nx-panel-head">
+      <div class="nx-panel-id">
+        <div class="nx-panel-icon">🧠</div>
+        <div><div class="nx-panel-name">Nexus</div><div class="nx-panel-role">Learning Companion</div></div>
+      </div>
+      <button class="nx-close" onclick="toggleNexus()">✕</button>
+    </div>
+    <div class="nx-msgs" id="nx-msgs"></div>
+    <div class="nx-divider"></div>
+    <!-- video recommendation inside widget -->
+    <div class="nx-vid-rec" id="nx-vid-rec">
+      <span class="nx-vid-rec-lbl">Watch This</span>
+      <p class="nx-vid-rec-text" id="nx-vid-rec-text"></p>
+      <button class="nx-vid-btn" id="nx-vid-btn" onclick="openVidFromWidget()">▶ Watch Now</button>
+    </div>
+    <!-- retry row -->
+    <div class="nx-retry-row" id="nx-retry-row">
+      <button class="btn btn-gold" style="font-size:10px;padding:9px 16px;" id="nx-retry-btn">↩ Retry</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+// INTEGRATION TOKENS
+// ══════════════════════════════════════════
+const WORKER_URL = 'https://nexus-proxy.blessedsalubi1.workers.dev';
+const MODEL      = 'gpt-4o';
+// const ANTHROPIC_API_KEY = 'ANTHROPIC_API_KEY_HERE';
+// const GH_TOKEN          = 'GITHUB_TOKEN_HERE';
+// const GH_REPO           = 'GITHUB_REPO_HERE';
+// const CF_ACCOUNT_ID     = 'CLOUDFLARE_ACCOUNT_ID_HERE';
+// const CF_PROJECT        = 'CLOUDFLARE_PROJECT_NAME_HERE';
+// const EMAIL_API_KEY     = 'RESEND_API_KEY_HERE';
+
+// ══════════════════════════════════════════
+// LESSON SCRIPTS
+// ══════════════════════════════════════════
+const LESSON_SCRIPTS = `
+MODULE 01 — Thinking Beyond Routine: Identify routines that waste time. Ask constructive why questions. When the reasons are weak, upgrade the process. Replace long meetings with short digital updates. Replace manual spreadsheets with shared dashboards.
+MODULE 02 — Making Sound Decisions Under Pressure: A rushed mind jumps to solutions. A focused mind defines the problem first. Think impact, not fear. Which option gives the best outcome with the least risk? Make the call, then review.
+MODULE 03 — Spotting Root Problems, Not Symptoms: Low performance is rarely about laziness. Use the 5 Whys — ask why repeatedly until the root cause surfaces. Solutions become obvious once the real cause is clear.
+MODULE 04 — Evaluating Information and Avoiding Bias: Pause before acting on any report or statistic. Ask where the data came from, how it was collected, whether it is complete. Multiple sources reveal truth. One loud opinion should not dictate conclusions.
+MODULE 05 — Strategic Thinking for Growth: Ideas are plenty but strategy turns them into results. Ask what problem this solves, who benefits, what resources are needed. Test assumptions. Anticipate risks before committing.
+`;
+
+const SCENARIO_BRIEF = `Meridian Corp is a growing operations consultancy in West Africa. Teams are missing deadlines and reporting burnout. Every Monday there is a two-hour progress meeting, three approval reports, and manual spreadsheet updates. Productivity is dropping. The learner is a Senior Analyst who must investigate root causes, evaluate conflicting evidence, navigate a resistant team member, and recommend a solution before the board meeting.`;
+
+// ══════════════════════════════════════════
+// VIDEO DATA
+// ══════════════════════════════════════════
+const VIDEOS = [
+  {id:'3TZ9Hfz-awY',title:'Thinking Beyond Routine',mod:'01'},
+  {id:'nphb5P01bns',title:'Making Sound Decisions Under Pressure',mod:'02'},
+  {id:'ztO8B5643Vc',title:'Spotting Root Problems, Not Symptoms',mod:'03'},
+  {id:'Tw-x2ZvwDeg',title:'Evaluating Information and Bias',mod:'04'},
+  {id:'5pA048_kcuU',title:'Strategic Thinking for Growth',mod:'05'},
+];
+
+// ══════════════════════════════════════════
+// NEXUS VOICES
+// ══════════════════════════════════════════
+const NV = {
+  Driver:{
+    welcome:(n)=>`I see you're a Driver, ${n} — decisive and action-oriented. That's a strength, but in this scenario, speed without reflection can cost you. I'll be nudging you to slow down and think through the implications before you act.`,
+    pre:['this module is about questioning habits that feel productive but aren\'t. For a Driver, that\'s uncomfortable — but necessary.','Speed is your default. This module asks: what if slowing down actually gets you there faster?','Pressure is where Drivers make their best and worst decisions. This module is about telling the difference.','This one is about data, not gut feel. Stay with it even when it slows you down.','Strategy feels like delay to a Driver. This module reframes it as the engine of execution.'],
+    post:['Notice the question asked before any action was taken? That pause is exactly what the next level will test.','The key insight wasn\'t the answer — it was the process. Which step would a Driver most likely skip?','That video showed what happens when speed outpaces thinking. Keep that image in mind.','One report, one opinion — and someone made a decision. That\'s the Driver trap. The next level tests whether you avoid it.','A strategy that isn\'t tested is just an idea. The next level asks you to test yours.'],
+    skip:(n)=>`Slow down, ${n}. The briefing has exactly what you need to make this work.`,
+    bad:(n)=>`${n}, that call skips a step. You have the evidence — use it before you commit.`,
+    rush:(n)=>`Hold on, ${n} — you're moving fast. Before you send that, consider the emotional state of the person you're responding to.`,
+    encourage:(n)=>`You worked that out, ${n}. Good instincts, now backed by evidence. Here's what carries forward — the next level builds on exactly this kind of structured challenge.`,
+    wrongDnd:(n)=>`${n}, you're sorting quickly but missing the distinction between causes and effects. Module 03 covers this directly — watch it and retry.`,
+    wrongMc:(n)=>`${n}, that response skips the evidence. Module 04 on evaluating information shows why verifying before acting matters here.`,
+  },
+  Analyst:{
+    welcome:(n)=>`You're an Analytical thinker, ${n} — thorough and precise. I'll make sure we go deep on the reasoning behind each decision. The risk for you is paralysis — I'll push you to commit when the evidence is sufficient.`,
+    pre:['Watch for the process behind the decision — not just the decision itself.','This module is structured around a framework. Map it as you watch.','This one surfaces a hidden variable most people miss. Stay analytical.','How many data points do you need to be confident? Keep that number in mind.','This module is about the quality of the data, not just its presence.'],
+    post:['The framework you just saw — where would it break down in the Meridian scenario?','Did you notice where the assumptions were hidden? The scenario will test whether you find them.','Root cause thinking requires resisting the obvious answer. The next level tests that resistance.','One source confirmed by another — that\'s the minimum. The next level gives you exactly that tension.','A good strategy survives pressure-testing. The next level is the test.'],
+    skip:(n)=>`${n}, the briefing modules contain data you'll need. Skipping them leaves gaps in your analysis.`,
+    bad:(n)=>`${n}, there's a framework that makes this clearer. Review the evidence before you finalise.`,
+    rush:(n)=>`${n}, slow down — you're pattern-matching without verifying. What's the actual data telling you?`,
+    encourage:(n)=>`Solid work, ${n}. Your systematic approach is holding up. Here's what carries forward — the next level rewards the same disciplined reasoning you just applied.`,
+    wrongDnd:(n)=>`${n}, the classification needs more precision. Module 03 on root cause identification gives you the framework — review it and retry.`,
+    wrongMc:(n)=>`${n}, the evidence points in a specific direction. Module 04 on evaluating information will clarify the distinction — watch it and retry.`,
+  },
+  Amiable:{
+    welcome:(n)=>`Welcome, ${n} — you lead with empathy, and that's a genuine strength. Just remember: the most caring recommendation is often the honest one, even when it's uncomfortable.`,
+    pre:['Think about how these changes affect the people involved, not just the process.','Notice how the team dynamic shifts depending on the approach taken.','The root cause affects real people. Watch for the human cost of each symptom.','Information bias often protects people we like. This module helps you see past that.','Strategy affects teams, not just timelines. Watch for the people dimension.'],
+    post:['The routine that was challenged — who was it protecting? The next level reveals that complexity.','That decision had a human cost either way. The next level asks you to navigate that tension.','The symptom was visible. The cause was hidden in a relationship. Keep that in mind.','Bias isn\'t always hostile — sometimes it\'s just loyalty. The next level tests whether you can see past it.','The strategy worked because it brought people with it. That\'s the lesson for the next level.'],
+    skip:(n)=>`${n}, these modules will help you understand how your team is experiencing this. Don't skip past the human story.`,
+    bad:(n)=>`${n}, think about how this decision lands with the people it affects before you finalise.`,
+    rush:(n)=>`${n}, before you respond — how is Marcus likely to feel when he reads this? Consider the relationship, not just the content.`,
+    encourage:(n)=>`You navigated that with care, ${n}. That kind of thoughtfulness is what Meridian needs. Here's what carries forward — the next level tests whether that care holds under higher stakes.`,
+    wrongDnd:(n)=>`${n}, think about the human experience behind each item. Module 03 on root causes helps you separate what people feel from what's actually causing it — watch it and retry.`,
+    wrongMc:(n)=>`${n}, the strongest recommendation protects both the people and the evidence. Module 04 shows how to balance both — watch it and retry.`,
+  },
+  Expressive:{
+    welcome:(n)=>`${n}, you see the big picture and that's a powerful lens. In this scenario, your challenge is connecting that vision to specific, actionable decisions. I'll help you make it land.`,
+    pre:['This module is a story as much as a lesson. Watch for the turning point.','The pressure in this module is real. Notice how the narrative shifts when the stakes are clear.','The root cause is always hiding behind the most compelling story. Watch for it.','This module is about truth over narrative. Sometimes the data contradicts the story everyone believes.','This module asks: what does a good idea actually look like when it becomes real?'],
+    post:['The story changed when one question was asked. What was that question? The next level will test whether you ask it.','The turning point wasn\'t the decision — it was when someone reframed the problem.','The real problem was never what it appeared. The next level rewards the person who looks past the surface story.','One data point told a story. A second told the truth. The next level has both.','A great strategy is a compelling story that actually works. That\'s what the final level tests.'],
+    skip:(n)=>`${n}, this moment matters. The briefing is the story behind the story — don't miss it.`,
+    bad:(n)=>`${n}, imagine how this decision reads six months from now. Does it still feel right?`,
+    rush:(n)=>`${n}, the most powerful responses aren't the fastest ones. What story do you want this message to tell?`,
+    encourage:(n)=>`That's the reframe that changes everything, ${n}. Here's what carries forward — the next level is where your big-picture thinking gets tested against the details.`,
+    wrongDnd:(n)=>`${n}, the narrative is clear but the categories need more precision. Module 03 gives you the analytical lens to match the story — watch it and retry.`,
+    wrongMc:(n)=>`${n}, the best story here is the one backed by evidence. Module 04 shows how to build that case — watch it and retry.`,
+  },
+};
+
+// ══════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════
+let ST = {};
+function initState(){
+  ST = {
+    name:'',email:'',profile:'',
+    curVid:1, watched:new Set(),
+    dndScore:0,dndAnswers:{},dndPassed:false,
+    mcCorrect:false,mcSelected:null,mcSubmitted:false,
+    dialTurns:0,dialHistory:[],dialFailed:false,dialUnintCount:0,dialProgressScore:0,dialEncourageSent:false,
+    failLevel:null,
+    nxOpen:false,
+    pendingVidIdx:null,
+    currentLevel:1,
+  };
+}
+initState();
+
+// ══════════════════════════════════════════
+// CURTAIN TRANSITION
+// ══════════════════════════════════════════
+function goScene(id, cb){
+  const c = document.getElementById('curtain');
+  c.classList.add('closing');
+  setTimeout(()=>{
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    window.scrollTo(0,0);
+    c.classList.remove('closing');
+    if(cb) cb();
+  }, 370);
+}
+
+// ══════════════════════════════════════════
+// WELCOME
+// ══════════════════════════════════════════
+const nameInp  = document.getElementById('inp-name');
+const emailInp = document.getElementById('inp-email');
+const wBtn     = document.getElementById('welcome-btn');
+function checkWelcome(){
+  const v=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailInp.value.trim());
+  wBtn.disabled = !(nameInp.value.trim().length>=2 && v);
+}
+nameInp.addEventListener('input',checkWelcome);
+emailInp.addEventListener('input',checkWelcome);
+[nameInp,emailInp].forEach(i=>i.addEventListener('keydown',e=>{if(e.key==='Enter'&&!wBtn.disabled)startJourney();}));
+function startJourney(){ ST.name=nameInp.value.trim(); ST.email=emailInp.value.trim(); goScene('s-personality'); }
+
+// ══════════════════════════════════════════
+// PERSONALITY
+// ══════════════════════════════════════════
+function selectProfile(card,p){
+  document.querySelectorAll('.p-card').forEach(c=>c.classList.remove('sel'));
+  card.classList.add('sel'); ST.profile=p;
+  document.getElementById('p-btn').disabled=false;
+  document.getElementById('p-hint').textContent=`${p} selected`;
+}
+function confirmProfile(){
+  if(!ST.profile) return;
+  document.getElementById('scene-name-span').textContent=ST.name;
+  // Nexus widget becomes visible NOW — from personality confirmation onward
+  showNexusWidget();
+  const voice=NV[ST.profile];
+  nxMsg('Welcome',voice.welcome(ST.name));
+  showNexusBadge();
+  goScene('s-scene');
+}
+
+// ══════════════════════════════════════════
+// NEXUS FLOATING WIDGET
+// ══════════════════════════════════════════
+function showNexusWidget(){ document.getElementById('nexus-widget').classList.add('visible'); }
+
+function toggleNexus(){
+  ST.nxOpen=!ST.nxOpen;
+  document.getElementById('nx-panel').classList.toggle('open',ST.nxOpen);
+  if(ST.nxOpen){ hideNexusBadge(); }
+}
+function openNexus(){ if(!ST.nxOpen){ ST.nxOpen=true; document.getElementById('nx-panel').classList.add('open'); hideNexusBadge(); } }
+function closeNexus(){ ST.nxOpen=false; document.getElementById('nx-panel').classList.remove('open'); }
+
+function showNexusBadge(){ document.getElementById('nx-badge').classList.add('show'); }
+function hideNexusBadge(){ document.getElementById('nx-badge').classList.remove('show'); }
+
+function nxMsg(tag, text){
+  const container=document.getElementById('nx-msgs');
+  const div=document.createElement('div');
+  div.className='nx-msg';
+  const rendered=text.replace(new RegExp(ST.name,'g'),`<span class="hl">${ST.name}</span>`);
+  div.innerHTML=`<span class="nx-msg-tag">${tag}</span><p class="nx-msg-text">${rendered}</p>`;
+  container.appendChild(div);
+  const hr=document.createElement('div');
+  hr.style.cssText='height:1px;background:var(--rim);margin:6px 0;flex-shrink:0;';
+  container.appendChild(hr);
+  container.scrollTop=container.scrollHeight;
+  showNexusBadge();
+}
+
+function nxVideoRec(text, vidIdx){
+  const rec=document.getElementById('nx-vid-rec');
+  document.getElementById('nx-vid-rec-text').textContent=text;
+  document.getElementById('nx-vid-btn').textContent=`▶ Watch Module ${String(vidIdx).padStart(2,'0')}`;
+  ST.pendingVidIdx=vidIdx;
+  rec.classList.add('show');
+}
+
+function nxRetryBtn(label, cb){
+  const row=document.getElementById('nx-retry-row');
+  const btn=document.getElementById('nx-retry-btn');
+  btn.textContent=label;
+  btn.onclick=()=>{ row.classList.remove('show'); document.getElementById('nx-vid-rec').classList.remove('show'); closeNexus(); cb(); };
+  row.classList.add('show');
+}
+
+function openVidFromWidget(){
+  if(ST.pendingVidIdx) openVid(ST.pendingVidIdx);
+}
+
+// ══════════════════════════════════════════
+// VIDEO
+// ══════════════════════════════════════════
+function initVideoScreen(){
+  const voice=NV[ST.profile];
+  // Welcome message + pre-video for mod 1
+  nxMsg('Before Module 01', voice.pre[0]);
+  openNexus();
+}
+
+function selectVid(i){
+  ST.curVid=i;
+  document.querySelectorAll('.vtab').forEach((t,idx)=>{
+    t.className='vtab'+(idx+1===i?' active':'')+(ST.watched.has(idx+1)?' watched':'');
+  });
+  const v=VIDEOS[i-1];
+  document.getElementById('vplay-title').textContent=v.title;
+  document.getElementById('vplay-sub').textContent=`MODULE ${v.mod} · ${ST.watched.has(i)?'✓ WATCHED · REWATCH':'TAP TO WATCH'}`;
+}
+
+function openVid(i){
+  const v=VIDEOS[i-1];
+  document.getElementById('vmodal-title').textContent=v.title;
+  const iframe=document.getElementById('vmodal-iframe');
+  iframe.src=`https://www.youtube-nocookie.com/embed/${v.id}?autoplay=1&rel=0&modestbranding=1&playsinline=1`;
+  document.getElementById('vmodal').classList.add('open');
+  document.body.style.overflow='hidden';
+  setTimeout(()=>markWatched(i),3000);
+}
+
+function openVidInline(i){ openVid(i); }
+
+function markWatched(i){
+  ST.watched.add(i);
+  document.getElementById(`vtab-${i}`) && document.getElementById(`vtab-${i}`).classList.add('watched');
+  document.getElementById('vbar-prog').textContent=`${ST.watched.size}/5 watched`;
+  if(ST.watched.size>=5){
+    document.getElementById('all-watched-badge').classList.add('show');
+    document.getElementById('video-next-btn').disabled=false;
+  }
+  // post-video nexus
+  const voice=NV[ST.profile];
+  if(voice && i<=voice.post.length){
+    nxMsg(`After Module ${VIDEOS[i-1].mod}`, voice.post[i-1]);
+    if(i<5){
+      nxMsg(`Before Module ${VIDEOS[i].mod}`, voice.pre[i]);
+    }
+  }
+}
+
+function closeVid(){
+  document.getElementById('vmodal-iframe').src='';
+  document.getElementById('vmodal').classList.remove('open');
+  document.body.style.overflow='';
+  selectVid(ST.curVid);
+}
+function handleVclick(e){ if(e.target===document.getElementById('vmodal')) closeVid(); }
+
+// Skip detection
+document.getElementById('video-next-btn').addEventListener('click',function(e){
+  if(ST.watched.size<5){
+    e.stopImmediatePropagation(); e.preventDefault();
+    const voice=NV[ST.profile];
+    nxMsg('Incomplete Briefing', voice.skip(ST.name));
+    openNexus();
+  }
+},{capture:true});
+
+function proceedToScenario(){
+  if(ST.watched.size<5) return;
+  goScene('s-scenario',()=>{
+    initLevel(1);
+    nxMsg('Investigation Begins',`You've completed all five briefing modules, ${ST.name}. Time to put it to work.`);
+  });
+}
+
+// ══════════════════════════════════════════
+// LEVEL INIT — explicit state check before render
+// ══════════════════════════════════════════
+function initLevel(n){
+  ST.currentLevel=n;
+  // update topbar
+  const labels=['','Level 1 — Identify','Level 2 — Evaluate','Level 3 — Dialogue','Level 4 — Results'];
+  document.getElementById('sc-lbadge').textContent=labels[n]||`Level ${n}`;
+  for(let i=1;i<=4;i++){
+    const pip=document.getElementById(`pip-${i}`);
+    pip.className='sc-pip'+(i<n?' done':i===n?' active':'');
+  }
+  document.querySelectorAll('.level-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById(`level-${n}`).classList.add('active');
+  window.scrollTo(0,0);
+
+  // STATE VERIFICATION per level
+  if(n===1) verifyLevel1();
+  if(n===2) verifyLevel2();
+  if(n===3) verifyLevel3();
+  if(n===4) buildResults();
+}
+
+// ADVANCE — only if previous level passed
+function advanceToLevel(n){
+  if(n===2 && !ST.dndPassed){ nxMsg('Not Yet',`Complete Level 1 correctly first, ${ST.name}.`); openNexus(); return; }
+  if(n===3 && !ST.mcCorrect){ nxMsg('Not Yet',`Complete Level 2 correctly first, ${ST.name}.`); openNexus(); return; }
+  initLevel(n);
+}
+
+// ══════════════════════════════════════════
+// LEVEL 1 — DND
+// ══════════════════════════════════════════
+function verifyLevel1(){
+  // Ensure all items draggable, buttons correct state
+  document.querySelectorAll('.dnd-item').forEach(i=>{
+    i.draggable=true; i.classList.remove('dragging');
+    i.style.borderColor=''; i.style.background='';
+  });
+  const placed=Object.keys(ST.dndAnswers).length;
+  const total=document.querySelectorAll('.dnd-item').length;
+  document.getElementById('dnd-check').disabled=placed<total;
+  document.getElementById('dnd-check').style.display=ST.dndPassed?'none':'';
+  document.getElementById('dnd-next').style.display=ST.dndPassed?'inline-flex':'none';
+  document.getElementById('dnd-retry').style.display='none';
+  document.getElementById('l1-vid-rec').classList.remove('show');
+  document.getElementById('dnd-fb').style.display=ST.dndPassed?'block':'none';
+  // Dead-end detection
+  if(!ST.dndPassed && placed===0 && Object.keys(ST.dndAnswers).length===0){
+    // perfectly fresh — good
+  }
+}
+
+let dragEl=null;
+document.querySelectorAll('.dnd-item').forEach(item=>{
+  item.addEventListener('dragstart',e=>{dragEl=item;item.classList.add('dragging');});
+  item.addEventListener('dragend',()=>{if(dragEl)dragEl.classList.remove('dragging');dragEl=null;});
+});
+function dndOver(e){e.preventDefault();e.currentTarget.classList.add('hover');}
+function dndLeave(e){e.currentTarget.classList.remove('hover');}
+function dndDrop(e,zone){
+  e.preventDefault();
+  const z=e.currentTarget; z.classList.remove('hover');
+  if(!dragEl) return;
+  const ph=z.querySelector('.dnd-ph'); if(ph)ph.remove();
+  let list=z.querySelector('.dnd-drop-list');
+  if(!list){list=document.createElement('div');list.className='dnd-drop-list';z.appendChild(list);}
+  list.appendChild(dragEl);
+  ST.dndAnswers[dragEl.dataset.id]=zone;
+  const total=document.querySelectorAll('.dnd-item').length;
+  document.getElementById('dnd-check').disabled=Object.keys(ST.dndAnswers).length<total;
+}
+
+function checkDnd(){
+  let correct=0,total=0;
+  document.querySelectorAll('.dnd-item').forEach(item=>{
+    total++;
+    if(ST.dndAnswers[item.dataset.id]===item.dataset.correct){
+      correct++; item.style.borderColor='var(--teal)'; item.style.background='rgba(42,143,130,.08)';
+    } else {
+      item.style.borderColor='var(--ember)'; item.style.background='rgba(212,82,42,.06)';
+    }
+  });
+  ST.dndScore=Math.round((correct/total)*100);
+
+  const fb=document.getElementById('dnd-fb');
+  fb.style.display='block';
+
+  if(ST.dndScore>=50){
+    ST.dndPassed=true;
+    fb.innerHTML=`<div class="fb-block" style="border-left:2px solid var(--teal)"><span class="fb-lbl">${ST.dndScore>=80?'Excellent':'Good analysis'}</span><p class="fb-text">You correctly classified ${correct} of ${total} items. ${ST.dndScore>=80?'Strong root-cause thinking.':'Review the highlighted items before continuing.'}</p></div>`;
+    document.getElementById('dnd-check').style.display='none';
+    document.getElementById('dnd-retry').style.display='none';
+    document.getElementById('dnd-next').style.display='inline-flex';
+    // Nexus encouragement
+    const voice=NV[ST.profile];
+    nxMsg('Level 1 Complete',voice.encourage(ST.name));
+    openNexus();
+  } else {
+    ST.dndPassed=false;
+    fb.innerHTML=`<div class="fb-block" style="border-left:2px solid var(--ember)"><span class="fb-lbl">Review needed</span><p class="fb-text">You classified ${correct} of ${total} items correctly. Review the highlighted items — causes are what create the problem; symptoms are what you observe as a result.</p></div>`;
+    document.getElementById('dnd-check').style.display='none';
+    document.getElementById('dnd-retry').style.display='inline-flex';
+    document.getElementById('dnd-next').style.display='none';
+    // Nexus: auto-open with video rec — DO NOT advance level
+    const voice=NV[ST.profile];
+    nxMsg('Level 1 — Review',voice.wrongDnd(ST.name));
+    nxVideoRec('Module 03 covers the difference between root causes and surface symptoms. Watch it, then retry Level 1.',3);
+    nxRetryBtn('↩ Retry Level 1', resetLevel1);
+    openNexus();
+    // Show inline rec too
+    const rec=document.getElementById('l1-vid-rec');
+    document.getElementById('l1-vid-rec-text').textContent=voice.wrongDnd(ST.name);
+    rec.classList.add('show');
+  }
+}
+
+function resetLevel1(){
+  ST.dndAnswers={}; ST.dndPassed=false; ST.dndScore=0;
+  const src=document.getElementById('dnd-src');
+  document.querySelectorAll('.dnd-item').forEach(i=>{
+    i.style.borderColor=''; i.style.background='';
+    i.draggable=true; src.appendChild(i);
+  });
+  ['drop-cause','drop-symptom'].forEach(id=>{
+    const z=document.getElementById(id);
+    const list=z.querySelector('.dnd-drop-list'); if(list)list.remove();
+    if(!z.querySelector('.dnd-ph')){
+      const ph=document.createElement('div');ph.className='dnd-ph';
+      ph.textContent=id==='drop-cause'?'Drop root causes here':'Drop symptoms here';
+      z.appendChild(ph);
+    }
+  });
+  document.getElementById('dnd-fb').style.display='none';
+  document.getElementById('dnd-check').style.display='';
+  document.getElementById('dnd-check').disabled=true;
+  document.getElementById('dnd-retry').style.display='none';
+  document.getElementById('dnd-next').style.display='none';
+  document.getElementById('l1-vid-rec').classList.remove('show');
+  document.getElementById('nx-vid-rec').classList.remove('show');
+  document.getElementById('nx-retry-row').classList.remove('show');
+}
+
+// ══════════════════════════════════════════
+// LEVEL 2 — MC
+// ══════════════════════════════════════════
+function verifyLevel2(){
+  // CRITICAL: ensure all options are unlocked and clickable
+  document.querySelectorAll('.mc-opt').forEach(o=>{
+    o.className='mc-opt'; // clear all state classes
+    o.style.pointerEvents='auto';
+    o.style.opacity='1';
+  });
+  ST.mcSelected=null; ST.mcSubmitted=false; ST.mcCorrect=false;
+  document.getElementById('mc-submit').disabled=true;
+  document.getElementById('mc-submit').style.display='';
+  document.getElementById('mc-retry').style.display='none';
+  document.getElementById('mc-next').style.display='none';
+  document.getElementById('mc-fb').style.display='none';
+  document.getElementById('l2-vid-rec').classList.remove('show');
+  document.getElementById('nx-vid-rec').classList.remove('show');
+  document.getElementById('nx-retry-row').classList.remove('show');
+}
+
+let mcSel=null;
+function selMc(el,idx){
+  // Guard: if already submitted, ignore
+  if(ST.mcSubmitted) return;
+  document.querySelectorAll('.mc-opt').forEach(o=>o.classList.remove('sel'));
+  el.classList.add('sel');
+  mcSel=idx; ST.mcSelected=idx;
+  document.getElementById('mc-submit').disabled=false;
+}
+
+function submitMc(){
+  if(mcSel===null) return;
+  ST.mcSubmitted=true;
+  const opts=document.querySelectorAll('.mc-opt');
+  opts.forEach((o,i)=>{
+    o.style.pointerEvents='none'; // lock after submission
+    if(o.dataset.correct==='true') o.classList.add('correct');
+    else if(i===mcSel && o.dataset.correct!=='true') o.classList.add('wrong');
+  });
+  ST.mcCorrect = opts[mcSel].dataset.correct==='true';
+  const fb=document.getElementById('mc-fb');
+  fb.style.display='block';
+  const voice=NV[ST.profile];
+
+  if(ST.mcCorrect){
+    fb.innerHTML=`<div class="fb-block" style="border-left:2px solid var(--teal)"><span class="fb-lbl">Sound reasoning</span><p class="fb-text">A structured pilot is the right call. It respects the existing process while generating the evidence needed for a permanent change.</p></div>`;
+    document.getElementById('mc-submit').style.display='none';
+    document.getElementById('mc-next').style.display='inline-flex';
+    nxMsg('Level 2 Complete',voice.encourage(ST.name));
+    openNexus();
+  } else {
+    fb.innerHTML=`<div class="fb-block" style="border-left:2px solid var(--ember)"><span class="fb-lbl">Consider this</span><p class="fb-text">The strongest recommendations use all available evidence without discarding either data source. A pilot approach tests the hypothesis before committing fully.</p></div>`;
+    document.getElementById('mc-submit').style.display='none';
+    document.getElementById('mc-retry').style.display='inline-flex';
+    document.getElementById('mc-next').style.display='none';
+    nxMsg('Level 2 — Review',voice.wrongMc(ST.name));
+    nxVideoRec('Module 04 on evaluating information shows how to weigh conflicting data sources — watch it, then retry Level 2.',4);
+    nxRetryBtn('↩ Retry Level 2',resetLevel2);
+    openNexus();
+    const rec=document.getElementById('l2-vid-rec');
+    document.getElementById('l2-vid-rec-text').textContent=voice.wrongMc(ST.name);
+    rec.classList.add('show');
+  }
+}
+
+function resetLevel2(){
+  verifyLevel2(); // this does the full clean reset
+  mcSel=null;
+}
+
+// ══════════════════════════════════════════
+// LEVEL 3 — DIALOGUE
+// ══════════════════════════════════════════
+function verifyLevel3(){
+  // Fresh state check
+  if(ST.dialTurns===0){
+    // already clean
+  }
+  document.getElementById('dial-next').style.display='none';
+  document.getElementById('dial-inp').disabled=false;
+  document.getElementById('dial-send-btn').disabled=false;
+  // Dead-end safety
+  if(ST.dialTurns>=8){ triggerDialFailure(); }
+}
+
+const MAX_DIAL=8;
+const UNINT_RE=/^[^a-z0-9]*$|^(.)\1{3,}$|^(lol|idk|ok|okay|yes|no|nope|yep|sure|hmm|hm|ugh|meh|k|kk|\?+|\.+|!+)$/i;
+
+const MARCUS_SYS=()=>`You are Marcus Adeyemi, Team Lead at Meridian Corp. You have run the Monday operations meetings for three years and feel threatened by an investigation. You are defensive and occasionally sarcastic but not hostile. You care about your team and believe the current structure protects them. The learner (${ST.name}, ${ST.profile}) is trying to get you to open up. Gradually become more open if they show genuine curiosity and respect. Become more resistant if they are dismissive or prescriptive. Maximum 2-3 sentences. Stay in character.`;
+
+async function sendDial(){
+  const inp=document.getElementById('dial-inp');
+  const text=inp.value.trim();
+  if(!text) return;
+  if(ST.dialTurns>=MAX_DIAL){ triggerDialFailure(); return; }
+
+  // Unintelligible check
+  if(UNINT_RE.test(text)||text.length<4){
+    ST.dialUnintCount++;
+    nxMsg('Nexus','That response doesn\'t address the situation. In a real workplace, sending something like this would be harmful.');
+    openNexus();
+    if(ST.dialUnintCount>=2){ triggerDialFailure(); return; }
+    return;
+  }
+  ST.dialUnintCount=0;
+
+  inp.value=''; inp.style.height='auto';
+  addDMsg('me',text);
+  ST.dialHistory.push({role:'user',content:text});
+  ST.dialTurns++;
+  updateDialLimit();
+
+  // Driver rush check
+  if(ST.profile==='Driver'&&text.length<20&&ST.dialTurns<=2){
+    nxMsg('Nexus — Pause',NV.Driver.rush(ST.name));
+    showNexusBadge();
+  }
+
+  document.getElementById('dial-send-btn').disabled=true;
+  document.getElementById('dial-typing').classList.add('show');
+
+  try{
+    const res=await fetch(WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:MODEL,max_tokens:180,messages:[{role:'system',content:MARCUS_SYS()},...ST.dialHistory]})});
+    const data=await res.json();
+    const reply=data.choices[0].message.content;
+    ST.dialHistory.push({role:'assistant',content:reply});
+    document.getElementById('dial-typing').classList.remove('show');
+    addDMsg('char',reply);
+
+    // ── PROGRESS EVALUATION (Bug 1) ──────────────────────────────
+    const lastMsg = ST.dialHistory.filter(m=>m.role==='user').slice(-1)[0]?.content||'';
+    const progressSignals = [
+      /why|because|reason|cause|suggest|consider|understand|feel|think|perhaps|maybe/i,
+      /meeting|process|routine|approval|spreadsheet|accountability|deadline/i,
+      /how|what if|could we|would it|have you|does this/i,
+    ];
+    const progressScore = progressSignals.filter(r=>r.test(lastMsg)).length;
+    ST.dialProgressScore = (ST.dialProgressScore||0) + progressScore;
+
+    // If turn 2+ and still no meaningful progress — surface video nudge
+    // ── Issue 2 FIX: open panel BEFORE adding video rec so button is visible ──
+    if(ST.dialTurns>=2 && ST.dialProgressScore===0){
+      const vidNudges = {
+        Driver:    `Before your next reply, ${ST.name} — watch Module 02 on making decisions under pressure. Ask yourself: what is the real problem Marcus is protecting against?`,
+        Analyst:   `${ST.name}, Module 03 on root cause analysis gives you a framework to reframe this conversation. What is Marcus actually defending?`,
+        Amiable:   `${ST.name}, Module 01 shows how to question a routine without threatening the person running it. Watch it before your next reply.`,
+        Expressive:`${ST.name}, the shift in this conversation starts with reframing the story. Module 05 on strategic thinking shows how. Watch it, then come back.`,
+      };
+      nxMsg('Nexus — Suggestion', vidNudges[ST.profile]||vidNudges.Analyst);
+      nxVideoRec(
+        `Module ${ST.dialTurns<=3?'02':'03'} is directly relevant to where this conversation is stuck. Watch it and return — you do not need to restart.`,
+        ST.dialTurns<=3?2:3
+      );
+      openNexus(); // must come AFTER nxVideoRec so panel opens with card already rendered
+    }
+
+    // ── Issue 1 FIX: View Results ONLY appears from consequence overlay ──
+    // Encourage at turn 3, then auto-show success consequence after brief pause
+    if(ST.dialTurns>=3 && !ST.dialEncourageSent){
+      ST.dialEncourageSent = true;
+      nxMsg('Nexus', NV[ST.profile].encourage(ST.name));
+      showNexusBadge();
+      // Lock further input and show success consequence after learner reads the message
+      setTimeout(()=>{
+        document.getElementById('dial-inp').disabled = true;
+        document.getElementById('dial-send-btn').disabled = true;
+        showConsequence('success');
+      }, 2200);
+    }
+  }catch(err){
+    document.getElementById('dial-typing').classList.remove('show');
+    addDMsg('char','[Connection issue — check Worker URL and try again]');
+    console.error(err);
+  }
+  // Only re-enable if limit not reached and failure not triggered
+  if(ST.dialTurns < MAX_DIAL && ST.failLevel !== 3){
+    document.getElementById('dial-send-btn').disabled=false;
+  }
+}
+
+function addDMsg(role,text){
+  const c=document.getElementById('dial-msgs'),t=document.getElementById('dial-typing');
+  const div=document.createElement('div');
+  div.className=`dmsg ${role}`;
+  div.innerHTML=`<div class="dbubble">${text}</div>`;
+  c.insertBefore(div,t); c.scrollTop=c.scrollHeight;
+}
+
+function updateDialLimit(){
+  const left=MAX_DIAL-ST.dialTurns;
+  document.getElementById('dial-counter').textContent=`${left} left`;
+  document.getElementById('dial-fill').style.width=`${(left/MAX_DIAL)*100}%`;
+  if(left<=2) document.getElementById('dial-fill').style.background='var(--ember)';
+  if(left<=0) triggerDialFailure();
+}
+
+function triggerDialFailure(){
+  // Lock input immediately so no further messages can be sent
+  document.getElementById('dial-inp').disabled=true;
+  document.getElementById('dial-send-btn').disabled=true;
+  document.getElementById('dial-next').style.display='none';
+  ST.failLevel=3;
+  // Show narrative consequence overlay after brief pause
+  setTimeout(()=>showConsequence('failure'), 600);
+}
+
+document.getElementById('dial-inp').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendDial();}});
+document.getElementById('dial-inp').addEventListener('input',function(){this.style.height='auto';this.style.height=Math.min(this.scrollHeight,88)+'px';});
+
+// ══════════════════════════════════════════
+// CONSEQUENCE OVERLAY
+// ══════════════════════════════════════════
+function showConsequence(type){
+  const overlay = document.getElementById('consequence-overlay');
+  const icon    = document.getElementById('consequence-icon');
+  const title   = document.getElementById('consequence-title');
+  const narr    = document.getElementById('consequence-narrative');
+  const note    = document.getElementById('consequence-nexus-note');
+  const btn     = document.getElementById('consequence-btn');
+
+  if(type==='failure'){
+    icon.textContent  = '⚠';
+    icon.style.color  = 'var(--ember)';
+    title.textContent = 'The Investigation Stalls';
+    title.style.color = 'var(--ember2)';
+    narr.textContent  = 'Without a clear recommendation from you, Marcus escalated directly to the Operations Director. The board meeting proceeded without your input. Leadership implemented the same Monday meeting structure unchanged — and team burnout continued into the following quarter.';
+    note.textContent  = 'Nexus observed that the conversation stayed at the surface level. The real issue — why Marcus defends the meeting so strongly — was never surfaced. Review Module 02 and Module 03 before retrying.';
+    btn.textContent   = '↩ Try Again';
+    btn.onclick       = ()=>{ closeConsequence(); resetLevel3(); };
+  } else {
+    icon.textContent  = '✦';
+    icon.style.color  = 'var(--gold)';
+    title.textContent = 'Marcus Opens Up';
+    title.style.color = 'var(--gold)';
+    narr.textContent  = 'By the end of the conversation, Marcus acknowledged that the meetings had grown beyond their original purpose. He agreed to trial a shorter async format for four weeks. Your recommendation now has an internal champion — and that changes everything about how leadership will receive it.';
+    note.textContent  = 'Nexus observed that you listened before prescribing. That is the skill this scenario was designed to build. Your results are ready.';
+    btn.textContent   = 'View My Results →';
+    btn.onclick       = ()=>{
+      closeConsequence();
+      // Now show the View Results button and advance
+      const dn = document.getElementById('dial-next');
+      dn.style.display = 'none'; // keep hidden — go directly to results
+      advanceToLevel(4);
+    };
+  }
+
+  overlay.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeConsequence(){
+  document.getElementById('consequence-overlay').style.display='none';
+  document.body.style.overflow='';
+}
+
+function resetLevel3(){
+  ST.dialTurns=0; ST.dialHistory=[]; ST.dialFailed=false;
+  ST.dialUnintCount=0; ST.dialProgressScore=0; ST.failLevel=null; ST.dialEncourageSent=false;
+  const dm=document.getElementById('dial-msgs');
+  const dt=document.getElementById('dial-typing');
+  while(dm.firstChild&&dm.firstChild!==dt) dm.removeChild(dm.firstChild);
+  const im=document.createElement('div'); im.className='dmsg char';
+  im.innerHTML=`<div class="dbubble">Look, I don't know what this "investigation" is supposed to prove. My team has run this process for three years. We know what works.</div>`;
+  dm.insertBefore(im,dt);
+  const dn=document.getElementById('dial-next');
+  dn.style.display='none';
+  dn.removeAttribute('data-shown');
+  dn.onclick=null;
+  document.getElementById('dial-counter').textContent=`${MAX_DIAL} left`;
+  document.getElementById('dial-fill').style.width='100%';
+  document.getElementById('dial-fill').style.background='var(--gold)';
+  document.getElementById('dial-inp').disabled=false;
+  document.getElementById('dial-send-btn').disabled=false;
+  initLevel(3);
+}
+
+// ══════════════════════════════════════════
+// LEVEL 4 — RESULTS
+// ══════════════════════════════════════════
+async function buildResults(){
+  const dndG=ST.dndScore>=80?'Excellent':ST.dndScore>=60?'Good':'Developing';
+  const mcG=ST.mcCorrect?'Correct':'Needs review';
+  const dialFailed = ST.failLevel===3;
+  const partialProgress = dialFailed && ST.dialProgressScore>0;
+  const dialG = dialFailed
+    ? (partialProgress ? `Partial (${ST.dialTurns} turns, some progress)` : `Incomplete (${ST.dialTurns} turns)`)
+    : ST.dialTurns>=6?'Deep':ST.dialTurns>=3?'Solid':'Surface';
+  document.getElementById('r1').textContent=`${ST.dndScore}% · ${dndG}`;
+  document.getElementById('r2').textContent=mcG;
+  document.getElementById('r3').textContent=`${ST.dialTurns} turns · ${dialG}`;
+  document.getElementById('r4').textContent=ST.profile;
+  const dialCredit = dialFailed
+    ? (partialProgress ? Math.min(ST.dialTurns*8, 35) : 0)
+    : Math.min(ST.dialTurns*14, 100);
+  let score=ST.dndScore*.4+(ST.mcCorrect?100:40)*.35+dialCredit*.25;
+  score=Math.round(score);
+  const grade=score>=85?'A':score>=70?'B':score>=55?'C':'D';
+  const label=score>=85?'Distinction':score>=70?'Merit':score>=55?'Pass':'Developing';
+  document.getElementById('lv4-grade').textContent=grade;
+  document.getElementById('lv4-label').textContent=`${score}% · ${label}`;
+  try{
+    const prompt=`You are Nexus, an AI learning companion. Write a personalised 3-sentence final assessment for ${ST.name}, a ${ST.profile} thinker who completed a critical thinking scenario about Meridian Corp. Results: root cause analysis ${ST.dndScore}% (${dndG}), evidence evaluation ${mcG}, dialogue engagement ${ST.dialTurns} turns (${dialG}), overall ${score}% (${label}). Address them by name. Acknowledge one genuine strength specific to their ${ST.profile} style and one area to develop. Sound like a thoughtful senior colleague, not a system report. No lists or bullets.`;
+    const res=await fetch(WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:MODEL,max_tokens:200,messages:[{role:'user',content:prompt}]})});
+    const data=await res.json();
+    const txt=data.choices[0].message.content;
+    document.getElementById('r-summary').innerHTML=txt.replace(new RegExp(ST.name,'g'),`<span class="hl">${ST.name}</span>`);
+  }catch(e){
+    document.getElementById('r-summary').innerHTML=`<span class="hl">${ST.name}</span>, you completed the Meridian Corp investigation with a score of ${score}%. Your ${ST.profile} approach shaped how you engaged with each challenge — take this forward into your next scenario.`;
+  }
+
+  // ── POST RESULTS TO LMS (postMessage bridge) ─────────────
+  // Reads lms_origin from URL param set by ScenarioPage.jsx.
+  // If running standalone (no lms_origin param), skips silently.
+  const _params    = new URLSearchParams(window.location.search);
+  const _lmsOrigin = _params.get('lms_origin');
+
+  if (_lmsOrigin) {
+    const _aiSummary = document.getElementById('r-summary').textContent;
+    const _resultPayload = {
+      type: 'NEXUS_RESULTS',
+      payload: {
+        name:               ST.name,
+        email:              ST.email,
+        personality:        ST.profile,
+        personality_observed: ST.profile,
+        dndScore:           ST.dndScore,
+        mcCorrect:          ST.mcCorrect,
+        dialTurns:          ST.dialTurns,
+        dialProgressScore:  ST.dialProgressScore || 0,
+        dialFailed:         dialFailed,
+        overall_score:      score,
+        grade,
+        label,
+        ai_summary:         _aiSummary,
+      }
+    };
+    // Send to LMS parent window — only to the known origin
+    window.parent.postMessage(_resultPayload, _lmsOrigin);
+  }
+}
+
+async function sendResults(){
+  const btn=document.querySelector('[onclick="sendResults()"]');
+  btn.disabled=true; btn.textContent='Sending...';
+  const status=document.getElementById('email-status');
+  const payload={to:ST.email,name:ST.name,profile:ST.profile,dndScore:ST.dndScore,mcCorrect:ST.mcCorrect,dialTurns:ST.dialTurns,summary:document.getElementById('r-summary').textContent,grade:document.getElementById('lv4-grade').textContent,label:document.getElementById('lv4-label').textContent};
+  try{
+    const res=await fetch(WORKER_URL+'/email',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'email',payload})});
+    if(res.ok){status.className='email-status ok';status.textContent=`✓ Results sent to ${ST.email}`;status.style.display='block';}
+    else throw new Error();
+  }catch(e){
+    try{const text=`Nexus Results — ${ST.name} (${ST.profile})\nScore: ${document.getElementById('lv4-label').textContent}\nLevel 1: ${document.getElementById('r1').textContent}\nLevel 2: ${document.getElementById('r2').textContent}\nLevel 3: ${document.getElementById('r3').textContent}\n\n${document.getElementById('r-summary').textContent}`;await navigator.clipboard.writeText(text);}catch(e2){}
+    status.className='email-status err';status.textContent='Email service not yet connected — results copied to clipboard.';status.style.display='block';
+  }
+  btn.disabled=false; btn.textContent='📧 Email My Results';
+}
+
+// ══════════════════════════════════════════
+// RESTART — complete state wipe
+// ══════════════════════════════════════════
+function restartAll(){
+  initState();
+  nameInp.value=''; emailInp.value=''; wBtn.disabled=true;
+  document.querySelectorAll('.p-card').forEach(c=>c.classList.remove('sel'));
+  document.getElementById('p-btn').disabled=true;
+  document.getElementById('p-hint').textContent='Select a profile to continue';
+  // video
+  document.getElementById('all-watched-badge').classList.remove('show');
+  document.getElementById('video-next-btn').disabled=true;
+  document.getElementById('vbar-prog').textContent='0/5 watched';
+  document.querySelectorAll('.vtab').forEach(t=>t.className='vtab');
+  document.getElementById('vtab-1').classList.add('active');
+  document.getElementById('vplay-title').textContent=VIDEOS[0].title;
+  document.getElementById('vplay-sub').textContent='MODULE 01 · TAP TO WATCH';
+  // dnd
+  resetLevel1();
+  // mc
+  verifyLevel2(); mcSel=null;
+  // dialogue
+  ST.dialTurns=0; ST.dialHistory=[];
+  const dm=document.getElementById('dial-msgs'),dt=document.getElementById('dial-typing');
+  while(dm.firstChild&&dm.firstChild!==dt)dm.removeChild(dm.firstChild);
+  const im=document.createElement('div');im.className='dmsg char';
+  im.innerHTML=`<div class="dbubble">Look, I don't know what this "investigation" is supposed to prove. My team has run this process for three years. We know what works.</div>`;
+  dm.insertBefore(im,dt);
+  document.getElementById('dial-counter').textContent=`${MAX_DIAL} left`;
+  document.getElementById('dial-fill').style.width='100%';
+  document.getElementById('dial-fill').style.background='var(--gold)';
+  document.getElementById('dial-inp').disabled=false;
+  document.getElementById('dial-send-btn').disabled=false;
+  const dn=document.getElementById('dial-next');
+  dn.style.display='none';
+  dn.removeAttribute('data-shown');
+  dn.onclick=null;
+  // consequence overlay
+  document.getElementById('consequence-overlay').style.display='none';
+  document.body.style.overflow='';
+  // nexus
+  document.getElementById('nexus-widget').classList.remove('visible');
+  document.getElementById('nx-panel').classList.remove('open');
+  document.getElementById('nx-msgs').innerHTML='';
+  document.getElementById('nx-vid-rec').classList.remove('show');
+  document.getElementById('nx-retry-row').classList.remove('show');
+  // results
+  document.getElementById('email-status').style.display='none';
+  goScene('s-welcome');
+}
+
+// ESC
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeVid();});
+</script>
+</body>
+</html>
