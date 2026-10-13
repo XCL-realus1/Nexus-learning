@@ -1226,7 +1226,7 @@ async function sendDial(){
   document.getElementById('dial-typing').classList.add('show');
 
   try{
-    const res=await fetch(WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json'},
+   const res=await fetch(WORKER_URL+'/chat',{method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({model:MODEL,max_tokens:180,messages:[{role:'system',content:MARCUS_SYS()},...ST.dialHistory]})});
     const data=await res.json();
     const reply=data.choices[0].message.content;
@@ -1276,7 +1276,7 @@ async function sendDial(){
     }
   }catch(err){
     document.getElementById('dial-typing').classList.remove('show');
-    addDMsg('char','[Connection issue — check Worker URL and try again]');
+   addDMsg('char',`[Connection error: ${err.message||String(err)}]`);
     console.error(err);
   }
   // Only re-enable if limit not reached and failure not triggered
@@ -1407,7 +1407,7 @@ async function buildResults(){
   document.getElementById('lv4-label').textContent=`${score}% · ${label}`;
   try{
     const prompt=`You are Nexus, an AI learning companion. Write a personalised 3-sentence final assessment for ${ST.name}, a ${ST.profile} thinker who completed a critical thinking scenario about Meridian Corp. Results: root cause analysis ${ST.dndScore}% (${dndG}), evidence evaluation ${mcG}, dialogue engagement ${ST.dialTurns} turns (${dialG}), overall ${score}% (${label}). Address them by name. Acknowledge one genuine strength specific to their ${ST.profile} style and one area to develop. Sound like a thoughtful senior colleague, not a system report. No lists or bullets.`;
-    const res=await fetch(WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json'},
+  const res=await fetch(WORKER_URL+'/chat',{method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({model:MODEL,max_tokens:200,messages:[{role:'user',content:prompt}]})});
     const data=await res.json();
     const txt=data.choices[0].message.content;
